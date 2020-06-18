@@ -1,0 +1,14 @@
+defaults: &defaults
+  case_api_base_url: <%= ENV.fetch('CASE_API_BASE_URL', 'http://case-api:8080') %>
+  perry_api_base_url: <%= ENV.fetch('PERRY_API_BASE_URL', 'http://perry:8080') %>
+  geo_api_base_url: <%= ENV.fetch('GEO_API_BASE_URL', 'http://geo-services-api:8080') %>
+  ferb_api_base_url: <%= ENV.fetch('FERB_API_BASE_URL', 'http://ferb-api:8080') %>
+development:
+  <<: *defaults
+test:
+  case_api_base_url: 'https://case-api.test'
+  ferb_api_base_url: 'https://ferb-api.test'
+  perry_api_base_url: 'https://perry.test'
+  geo_api_base_url: 'http://geo-services-api.test'
+production:
+  <<: *defaults

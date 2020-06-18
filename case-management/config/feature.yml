@@ -1,0 +1,15 @@
+development:
+  features:
+    authentication: <%= ENV.fetch('AUTHENTICATION', false) %>
+    dashboard_case_actions: <%= ENV.fetch('FEATURE_DASHBOARD_CASE_ACTIONS', true) %>
+    dashboard_placement_tool: <%= ENV.fetch('FEATURE_DASHBOARD_PLACEMENT_TOOL', true) %>
+test:
+  features:
+    authentication: <%= ENV.fetch('AUTHENTICATION', true) %>
+    dashboard_case_actions: <%= ENV.fetch('FEATURE_DASHBOARD_CASE_ACTIONS', false) %>
+    dashboard_placement_tool: <%= ENV.fetch('FEATURE_DASHBOARD_PLACEMENT_TOOL', false) %>
+production:
+  features:
+    authentication: <%= ENV.fetch('AUTHENTICATION', true) %>
+    dashboard_case_actions: <%= ENV.fetch('FEATURE_DASHBOARD_CASE_ACTIONS', false) %>
+    dashboard_placement_tool: <%= ENV.fetch('FEATURE_DASHBOARD_PLACEMENT_TOOL', false) %>

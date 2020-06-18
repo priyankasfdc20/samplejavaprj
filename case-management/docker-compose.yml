@@ -1,0 +1,130 @@
+version: '3.2'
+services:
+  db2:
+    image: cwds/db2data:latest
+    hostname: db2
+    ports:
+      - ${DB_CMS_DB2_PORT}:50000
+    environment:
+      DB2INST1_PASSWORD: ${DB_CMS_PASSWORD}
+      LICENSE: "accept"
+      DB2NAME: ${DB_CMS_DB_NAME}
+  perry:
+    image: cwds/perry:3.0.1_581-RC
+    ports:
+      - ${PERRY_PORT}:8080
+      - ${PERRY_ADMIN_PORT}:9082
+    environment:
+      DEV_MODE: ${DEV_MODE}
+      LOG_LEVEL: "INFO"
+  case-api:
+    image: cwds/case-management-api:latest
+    hostname: casemanagement
+    depends_on:
+      - db2
+      - perry
+    restart: on-failure
+    ports:
+      - ${CASE_API_PORT}:8080
+    environment:
+      SHIRO_CONFIG_PATH: ${CASE_SHIRO_CONFIG_PATH}
+      AUTHORIZATION: ${CASE_AUTHORIZATION_ENABLED}
+      KEY_STORE_FILE: ${CASE_KEY_STORE_FILE}
+      DB_CMS_JDBC_URL: "jdbc:db2://db2:${DB_CMS_DB2_PORT}/${DB_CMS_DB_NAME}"
+      DB_RS_JDBC_URL: "jdbc:db2://db2:${DB_CWSRS_DB2_PORT}/${DB_CWSRS_DB_NAME}"
+      LOGIN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/login"
+      LOGOUT_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/logout"
+      SWAGGER_TOKEN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/token"
+      SWAGGER_JSON_URL: "http://${DEV_IP}:${CASE_API_PORT}/swagger.json"
+      SWAGGER_CALLBACK_URL: "http://${DEV_IP}:${CASE_API_PORT}/swagger"
+  geo-services-api:
+    image: cwds/geo-services-api:latest
+    restart: always
+    depends_on:
+      - perry
+    ports:
+     - ${GEO_API_PORT}:8080
+    environment:
+      SS_ID: "${SS_ID}"
+      SS_TOKEN: "${SS_TOKEN}"
+      LOGIN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/login"
+      LOGOUT_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/logout"
+      SWAGGER_TOKEN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/token"
+      SWAGGER_JSON_URL: "http://${DEV_IP}:${GEO_API_PORT}/swagger.json"
+      SWAGGER_CALLBACK_URL: "http://${DEV_IP}:${GEO_API_PORT}/swagger"
+  postgres:
+    image: cwds/postgresql_data
+    hostname: postgres
+    ports:
+      - ${POSTGRES_PORT}:5432
+  ferb-api:
+    image: cwds/api
+    ports:
+      - ${FERB_API_PORT}:8080
+    depends_on:
+      - db2
+      - postgres
+      - perry
+    restart: on-failure
+    environment:
+      SHIRO_CONFIG_PATH: ${FERB_SHIRO_CONFIG_PATH}
+      DB_CMS_JDBC_URL: "jdbc:db2://db2:${DB_CMS_DB2_PORT}/${DB_CMS_DB_NAME}"
+      DB_CMS_USER: ${DB_CMS_USER}
+      DB_CMS_PASSWORD: ${DB_CMS_PASSWORD}
+      DB_CMS_SCHEMA: ${DB_CMS_SCHEMA}
+      DB_CWSRS_JDBC_URL: "jdbc:db2://db2:${DB_CWSRS_DB2_PORT}/${DB_CWSRS_DB_NAME}"
+      DB_CWSRS_USER: ${DB_CWSRS_USER}
+      DB_CWSRS_PASSWORD: ${DB_CWSRS_PASSWORD}
+      DB_CWSRS_SCHEMA: ${DB_CWSRS_SCHEMA}
+      DB_NS_JDBC_URL: "jdbc:postgresql://postgres:${POSTGRES_PORT}/${DB_NS_DB_NAME}"
+      DB_NS_USER: ${DB_NS_USER}
+      DB_NS_PASSWORD: ${DB_NS_PASSWORD}
+      LOGIN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/login"
+      LOGOUT_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/logout"
+      SWAGGER_TOKEN_URL: "http://${DEV_IP}:${PERRY_PORT}/perry/authn/token"
+      SWAGGER_JSON_URL: "http://${DEV_IP}:${FERB_API_PORT}/swagger.json"
+      SWAGGER_CALLBACK_URL: "http://${DEV_IP}:${FERB_API_PORT}/swagger"
+  redis:
+    image: redis
+    ports:
+      - ${REDIS_PORT}:6379
+  case-web:
+    build:
+      context: .
+      dockerfile: docker/web/Dockerfile
+    volumes:
+      - type: bind
+        source: ./app
+        target: /app/app
+    ports:
+      - ${CASE_APP_PORT}:3000
+      - ${CASE_APP_WEBPACK_PORT}:3035
+    environment:
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      CASE_API_BASE_URL: "http://${DEV_IP}:${CASE_API_PORT}/"
+      CASE_APP_JS_API_URL: ${CASE_APP_JS_API_URL}
+      PERRY_API_BASE_URL: "http://${DEV_IP}:${PERRY_PORT}/perry"
+      GEO_API_BASE_URL: "http://${DEV_IP}:${GEO_API_PORT}/"
+      AUTHENTICATION: ${AUTHENTICATION}
+      FEATURE_DASHBOARD_CASE_ACTIONS: ${FEATURE_DASHBOARD_CASE_ACTIONS}
+      FEATURE_DASHBOARD_PLACEMENT_TOOL: ${FEATURE_DASHBOARD_PLACEMENT_TOOL}
+    command: ['bundle', 'exec', 'rails', 'server']
+    depends_on:
+      - redis
+      - perry
+      - geo-services-api
+      - case-api
+      - ferb-api
+  case-test:
+    build:
+      context: .
+      dockerfile: docker/test/Dockerfile
+    volumes:
+      - type: bind
+        source: ./spec
+        target: /app/spec
+    environment:
+      - SECRET_KEY_BASE
+      - CASE_API_BASE_URL
+      - PERRY_API_BASE_URL
+      - CASE_WEB_BASE_URL

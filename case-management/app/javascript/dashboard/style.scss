@@ -1,0 +1,150 @@
+@import 'react-bootstrap-table/css/react-bootstrap-table.css';
+
+.list-group-item .card-header {
+  border-bottom: 0;
+  padding: 0;
+}
+
+a.list-group-item {
+  color: #1a1a1a;
+}
+
+a.list-group-item:hover {
+  background-color: #d8ecf0;
+  color: #1a1a1a;
+}
+
+table tr:nth-child(even) {
+  background-color: #fff;
+}
+
+.table > thead > tr > th {
+  vertical-align: bottom;
+  border-bottom: 0 solid #fff;
+}
+
+.dropbtn {
+  clear: both;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button {
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  border-width: 0 0 0.1px 0.1px;
+}
+
+button:focus {
+  outline: 0;
+}
+
+.dropdown {
+  clear: both;
+  position: absolute;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.dropdown-content {
+  clear: both;
+  position: absolute;
+  display: inline-grid;
+  margin-left: -100px;
+  margin-top: 12px;
+  box-shadow: 0 1px 7px 0 rgb(106, 111, 109);
+  z-index: 1;
+}
+
+.dropdown-pointer {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 25px 25px 25px;
+  border-color: transparent transparent transparent transparent;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 10px 12px;
+  display: block;
+  background-color: rgb(248, 248, 248);
+  width: 238px;
+  text-align: left;
+  text-decoration: none;
+  float: left !important;
+  border-bottom: 1px solid rgb(211, 211, 211);
+}
+
+.dropdown-content :hover {
+  background-color: #d8ecf0;
+}
+
+i {
+  border-width: 0 6px 6px 0;
+  display: inline-block;
+  padding: 8px;
+  margin-left: 74px;
+  margin-top: 4px;
+  background-color: #fff;
+  border: 2px solid rgb(196, 196, 196);
+}
+
+.up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+.glyphicon {
+  font-size: 16px;
+}
+
+.glyphicon:active {
+  color: #0d8ecf;
+}
+
+.glyphicon:hover {
+  color: #0d8ecf;
+}
+
+.span-hover:hover .glyphicon {
+  color: #0d8ecf;
+}
+
+.span-hover:active .glyphicon {
+  color: #0d8ecf;
+}
+
+.react-bs-table .react-bs-container-header {
+  border-bottom: 1px solid rgb(225, 225, 225);
+}
+
+.caret {
+  display: inline-block;
+  color: #0d8ecf;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 10px dashed;
+  border-top: 10px solid \9;
+  border-right: 5px solid transparent;
+  border-left: 5px solid transparent;
+}
+
+.dropup .caret {
+  color: #0d8ecf;
+  border-top: 0;
+  border-bottom: 10px dashed;
+  border-bottom: 10px solid \9;
+  content: '';
+}
+
+.react-bs-table .react-bs-container-header .sorted-column {
+  color: #0d8ecf;
+  font-weight: 800;
+  border-bottom: 5px solid #0d8ecf;
+}
+
